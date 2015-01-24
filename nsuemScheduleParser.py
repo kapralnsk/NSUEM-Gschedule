@@ -6,15 +6,6 @@ from bs4 import BeautifulSoup
 import re
 import datetime
 
-weekdayDictionary = {
-	"Понедельник": 0,
-	"Вторник": 1,
-	"Среда": 2,
-	"Четверг": 3,
-	"Пятница": 4,
-	"Суббота": 5
-}
-
 
 def changeWeek(week):
 	if week == 1:
