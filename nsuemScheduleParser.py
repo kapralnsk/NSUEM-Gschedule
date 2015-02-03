@@ -3,7 +3,6 @@ __author__ = 'KAPRAL'
 
 import urllib2
 from bs4 import BeautifulSoup
-import re
 import datetime
 
 
@@ -36,7 +35,6 @@ def getEventsList(group):
     :return eventsList - list.
     """
     # fetching table
-
 
     page = urllib2.urlopen("http://rasp.nsuem.ru/group/" + group)
     soup = BeautifulSoup(page).find("table", {"class": "table table-hover table-bordered table-condensed"})
@@ -133,7 +131,7 @@ def formCalEvent(exercise):
     if semesterStart.month == 9:
         rruleEnd = semesterStart.replace(month=12, day=31)
     else:
-        rruleEnd = semesterStart.replace(month=5, day=31)
+        rruleEnd = semesterStart.replace(month=3, day=31)
     rruleEnd.replace()
     rruleEnd = rruleEnd.strftime("%Y%m%d")
 
@@ -145,16 +143,15 @@ def formCalEvent(exercise):
     'summary': exercise['name'] + ' (' + exercise['type'] + ')',
     'location': exercise['room'],
     'start': {
-    'datetime': exerciseStart.strftime('%Y%m%d') + 'T' + exerciseStart.strftime('%H%M') + '000',
-    # TODO: возможно формат неверный
-    'timezone': 'Russia/Novosibirsk'
+    'dateTime': exerciseStart.strftime('%Y-%m-%d') + 'T' + exerciseStart.strftime('%H:%M') + ':00',
+    'timeZone': 'Asia/Novosibirsk'
     },
     'end': {
-    'datetime': exerciseEnd.strftime('%Y%m%d') + 'T' + exerciseEnd.strftime('%H%M') + '000',
-    'timezone': 'Russia/Novosibirsk'
+    'dateTime': exerciseEnd.strftime('%Y-%m-%d') + 'T' + exerciseEnd.strftime('%H:%M') + ':00',
+    'timeZone': 'Asia/Novosibirsk'
     },
-    'reccurrence': [
-        'RRULE:FREQ=WEEKLY;INTERVAL=2;UNTIL=' + rruleEnd + "T210000"
+    'recurrence': [
+        'RRULE:FREQ=WEEKLY;INTERVAL=2;UNTIL=' + rruleEnd + "T210000" + 'Z'
     ]
     }
     return event
