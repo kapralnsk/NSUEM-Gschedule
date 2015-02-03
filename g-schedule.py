@@ -13,17 +13,6 @@ from oauth2client.appengine import OAuth2DecoratorFromClientSecrets
 
 # constants
 
-decorator = OAuth2DecoratorFromClientSecrets(
-  os.path.join(os.path.dirname(__file__), 'client_secrets.json'),
-  'https://www.googleapis.com/auth/calendar')
-
-# decorator = OAuth2Decorator(
-#   client_id='977232472779-kpi8m6iuibq4jo6rtm0u54c16vpkivoe.apps.googleusercontent.com',
-#   client_secret='ZAnqewrLiJwegobJI1V4qfsv',
-#   scope='https://www.googleapis.com/auth/calendar')
-
-service = build('calendar', 'v3')
-
 HEADER_HTML = """\
 <html>
   <head>
@@ -52,6 +41,12 @@ GROUP_SELECTION_FORM = """\
 
 # end of constants
 
+decorator = OAuth2DecoratorFromClientSecrets(
+  os.path.join(os.path.dirname(__file__), 'client_secrets.json'),
+  'https://www.googleapis.com/auth/calendar')
+
+service = build('calendar', 'v3')
+
 class GroupSelectionPage(webapp2.RequestHandler):
 
     def get(self):
@@ -70,13 +65,20 @@ class DoTheMagic(webapp2.RequestHandler):
 
         # Get the authorized Http object created by the decorator.
         http = decorator.http()
-        # Call the service using the authorized Http object.
 
+        # making a calendar for current semester
+        semesterStart = nsuemScheduleParser.setSemesterStart()
+        if semesterStart.month >= 8:
+            anotherYear = int(semesterStart.strftime('%y')) + 1
+            year = semesterStart.strftime('%y-') + str(anotherYear) + '_1'
+        else:
+            anotherYear = int(semesterStart.strftime('%y')) - 1
+            year = str(anotherYear) + '-' + semesterStart.strftime('%y') + '_2'
+        calendarName = 'semester_'
         calendar = {
-            'summary': 'semester',
+            'summary': calendarName,
             'timeZone': 'Asia/Novosibirsk'
             }
-
         createdCalendar = service.calendars().insert(body=calendar).execute(http=http)
 
         for event in schedule:
