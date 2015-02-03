@@ -38,7 +38,6 @@ GROUP_SELECTION_FORM = """\
 <div><input type="submit" value="Ду зе мэджик"></div>
 </form>
 """
-
 # end of constants
 
 decorator = OAuth2DecoratorFromClientSecrets(
