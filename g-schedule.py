@@ -56,6 +56,9 @@ class GroupSelectionPage(webapp2.RequestHandler):
 
 class DoTheMagic(webapp2.RequestHandler):
 
+    def get(self):
+        self.redirect('/')
+
     @decorator.oauth_required
     def post(self):
 
@@ -73,7 +76,8 @@ class DoTheMagic(webapp2.RequestHandler):
         else:
             anotherYear = int(semesterStart.strftime('%y')) - 1
             year = str(anotherYear) + '-' + semesterStart.strftime('%y') + '_2'
-        calendarName = 'semester_'
+
+        calendarName = 'semester_' + year
         calendar = {
             'summary': calendarName,
             'timeZone': 'Asia/Novosibirsk'
