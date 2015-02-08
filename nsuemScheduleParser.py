@@ -37,8 +37,12 @@ def getEventsList(group):
     # fetching table
 
     page = urllib2.urlopen("http://rasp.nsuem.ru/group/" + group)
-    soup = BeautifulSoup(page).find("table", {"class": "table table-hover table-bordered table-condensed"})
-    currentRow = soup.tbody.tr
+    soup = BeautifulSoup(page)
+
+    # limiting soup only to the table
+    table = soup.find("table", {"class": "table table-hover table-bordered table-condensed"})
+    tableSoup = BeautifulSoup(unicode(table))
+    currentRow = tableSoup.tbody.tr
 
     # TODO remove if now useless
     exercise = {
@@ -56,7 +60,7 @@ def getEventsList(group):
     # welcome to the PAIN
     while currentRow is not None:
         try:
-            wut = currentRow.contents[0]
+            wut = currentRow.contents[0]  # TODO: i am ashamed of this
         except IndexError:
             currentRow = currentRow.find_next('tr')
         else:
@@ -65,19 +69,13 @@ def getEventsList(group):
             # processing cell
             while cell is not None:
 
-                # processing colspaned cell
-                # TODO: fix crash on colspaned cell (text:"Выходной")
-                if cell.get('colspan') == 3:
-                    cell = cell.next_sibling
-                    continue
-
                 # processing empty cells (might be a func)
                 if cell.contents[0].encode('utf-8') == ' ':
                     if cell.next_sibling is not None:
                         try:
-                            wut = cell.next_sibling['id']
+                            wut = cell.next_sibling['id']  # TODO: and this
                         except KeyError:
-                            week = changeWeek(week)
+                            week = changeWeek(week)  # TODO: and this
                     else:
                         week = changeWeek(week)
                     cell = cell.next_sibling
@@ -88,12 +86,19 @@ def getEventsList(group):
                 except KeyError:
                     week = changeWeek(week)
                     exercise['week'] = week
+
                     if cell.b is None:
                         exercise['type'] = 'Л'
                         cellData = getTD_Data(cell)
                     else:
                         exercise['type'] = 'С'
                         cellData = getTD_Data(cell.b)
+
+                    if cellData is None:
+                        currentRow = currentRow.find_next('tr')
+                        week = changeWeek(week)
+                        break
+
                     exercise['name'] = cellData['name']
                     exercise['room'] = cellData['room']
                     eventsList.append(formCalEvent(exercise))
@@ -103,13 +108,22 @@ def getEventsList(group):
                     elif cellCSS_ID[0:4] == 'time':
                         exercise['time'] = cell.div.get_text().encode('utf-8')
                 cell = cell.next_sibling
-            currentRow = currentRow.find_next('tr')
+
+            # check if end of table is reached
+            try:
+                currentRow = currentRow.find_next('tr')
+            except AttributeError:
+                break
 
     return eventsList
 
 
 def getTD_Data(scope):
     data = scope.div
+
+    if data is None:
+        return None
+
     TD_Data = {}
     name = data.get_text().encode('utf-8')
     TD_Data['name'] = name[0:len(name) - 8]
@@ -131,7 +145,7 @@ def formCalEvent(exercise):
     if semesterStart.month == 9:
         rruleEnd = semesterStart.replace(month=12, day=31)
     else:
-        rruleEnd = semesterStart.replace(month=3, day=31)
+        rruleEnd = semesterStart.replace(month=5, day=31)
     rruleEnd.replace()
     rruleEnd = rruleEnd.strftime("%Y%m%d")
 
@@ -140,7 +154,7 @@ def formCalEvent(exercise):
     exerciseEnd = exerciseStart + exerciseLength
 
     event = {
-    'summary': exercise['name'] + ' (' + exercise['type'] + ')',
+    'summary': exercise['name'] + ' (' + exercise['type'] + ')'.encode('utf-8'),
     'location': exercise['room'],
     'start': {
     'dateTime': exerciseStart.strftime('%Y-%m-%d') + 'T' + exerciseStart.strftime('%H:%M') + ':00',
