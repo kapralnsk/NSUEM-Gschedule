@@ -19,14 +19,14 @@ def setSemesterStart():
     """
     getDate = datetime.datetime.today()
     if getDate.month >= 8:
-        getDate = getDate.replace(month=9, day=1)
-        if getDate.weekday() == 6:
-            getDate.replace(month=9, day=2)
+        startDate = getDate.replace(month=9, day=1)
+        if startDate.weekday() == 6:
+            startDate.replace(month=9, day=2)
     else:
-        getDate.replace(month=2, day=1)
-        if getDate.weekday() == 6:
-            getDate = getDate.replace(month=2, day=2)
-    return getDate
+        startDate = getDate.replace(month=2, day=1)
+        if startDate.weekday() == 6:
+            startDate = startDate.replace(month=2, day=2)
+    return startDate
 
 
 def getEventsList(group):
@@ -145,7 +145,7 @@ def formCalEvent(exercise):
     if semesterStart.month == 9:
         rruleEnd = semesterStart.replace(month=12, day=31)
     else:
-        rruleEnd = semesterStart.replace(month=5, day=31)
+        rruleEnd = semesterStart.replace(month=3, day=31)
     rruleEnd.replace()
     rruleEnd = rruleEnd.strftime("%Y%m%d")
 
