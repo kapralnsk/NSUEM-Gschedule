@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Alexandr'
 
-from google.appengine.api import users
 import os
 import cgi
+import jinja2
 import webapp2
 import nsuemScheduleParser
 
@@ -13,31 +13,11 @@ from oauth2client.appengine import OAuth2DecoratorFromClientSecrets
 
 # constants
 
-HEADER_HTML = """\
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  </head>
-  <body>
-"""
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
-FOOTER_HTML = """\
-  </body>
-</html>
-"""
-
-WHITESPACE = '<br /><br />'
-
-GROUP_SELECTION_FORM = """\
-<form action="/dothemagic" method="post">
-<select name="group-selector" style="width:100px; margin-bottom:10px">
-<option name="1761" value="1761">1761</option>
-<option name="1762" value="1762">1762</option>
-<option name="2761" value="2761">2761</option>
-</select>
-<div><input type="submit" value="Ду зе мэджик"></div>
-</form>
-"""
 # end of constants
 
 decorator = OAuth2DecoratorFromClientSecrets(
@@ -49,10 +29,22 @@ service = build('calendar', 'v3')
 class GroupSelectionPage(webapp2.RequestHandler):
 
     def get(self):
-        self.response.headers['Content-Type'] = 'text/html'
-        self.response.write(HEADER_HTML)
-        self.response.write(GROUP_SELECTION_FORM)
-        self.response.write(FOOTER_HTML)
+
+
+        # TODO exceptions to check cookies? there's got to be another way
+        # кука имени Шариповой! :)
+        try:
+            self.request.cookies['sharap']
+        except KeyError:
+            template = JINJA_ENVIRONMENT.get_template('index.html')
+        else:
+            template = JINJA_ENVIRONMENT.get_template('lena.html')
+        if self.request.get('sharap', default_value='no') != 'no':
+            self.response.set_cookie('sharap', 'true')
+            template = JINJA_ENVIRONMENT.get_template('lena.html')
+
+        self.response.write(template.render())
+
 
 class DoTheMagic(webapp2.RequestHandler):
 
@@ -88,10 +80,9 @@ class DoTheMagic(webapp2.RequestHandler):
             calendarEvent = event
             createdEvent = service.events().insert(calendarId=createdCalendar['id'], body=calendarEvent).execute(http=http)
 
-        self.response.headers['Content-Type'] = 'text/html'
-        self.response.write(HEADER_HTML)
-        self.response.write('magic should be done')
-        self.response.write(FOOTER_HTML)
+        template = JINJA_ENVIRONMENT.get_template('magic.html')
+
+        self.response.write(template.render())
 
 
 application = webapp2.WSGIApplication([
