@@ -30,20 +30,19 @@ class GroupSelectionPage(webapp2.RequestHandler):
 
     def get(self):
 
+        template = JINJA_ENVIRONMENT.get_template('index.html')
+        params = {} # temporary fix
 
-        # TODO exceptions to check cookies? there's got to be another way
         # кука имени Шариповой! :)
-        try:
-            self.request.cookies['sharap']
-        except KeyError:
-            template = JINJA_ENVIRONMENT.get_template('index.html')
-        else:
-            template = JINJA_ENVIRONMENT.get_template('lena.html')
+        if self.request.cookies.get('sharap') is not None:
+            params = {'sharap': 'true', }
+
         if self.request.get('sharap', default_value='no') != 'no':
             self.response.set_cookie('sharap', 'true')
-            template = JINJA_ENVIRONMENT.get_template('lena.html')
+            params = {'sharap': 'true', }
 
-        self.response.write(template.render())
+        self.response.write(template.render(params))
+
 
 
 class DoTheMagic(webapp2.RequestHandler):
@@ -81,12 +80,32 @@ class DoTheMagic(webapp2.RequestHandler):
             createdEvent = service.events().insert(calendarId=createdCalendar['id'], body=calendarEvent).execute(http=http)
 
         template = JINJA_ENVIRONMENT.get_template('magic.html')
+        params = {}  # temporary fix
 
-        self.response.write(template.render())
+
+        # кука имени Шариповой! :)
+        if self.request.cookies.get('sharap') is not None:
+            params = {'sharap': 'true', }
+
+        self.response.write(template.render(params))
+
+
+class ItsAlive(webapp2.RequestHandler):
+    def get(self):
+
+        template = JINJA_ENVIRONMENT.get_template('itsalive.html')
+
+        params = {}  # temporary fix
+        # кука имени Шариповой! :)
+        if self.request.cookies.get('sharap') is not None:
+            params = {'sharap': 'true', }
+
+        self.response.write(template.render(params))
 
 
 application = webapp2.WSGIApplication([
     ('/', GroupSelectionPage),
     ('/dothemagic', DoTheMagic),
+    ('/its-alive', ItsAlive),
     (decorator.callback_path, decorator.callback_handler()),
 ], debug=True)

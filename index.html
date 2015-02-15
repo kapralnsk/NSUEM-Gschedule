@@ -3,6 +3,9 @@
 		 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 		 <link href="/static/flat-ui-dist/css/vendor/bootstrap.min.css" rel="stylesheet">
 		 <link href="/static/flat-ui-dist/css/flat-ui.min.css" rel="stylesheet">
+        {% if sharap %}
+            <link href="/static/sharap.css" rel="stylesheet">
+        {% endif %}
 	</head>
 	<body>
 		<div>
@@ -22,9 +25,12 @@
 					<option name="1762" value="1762">1762</option>
 					<option name="2761" value="2761">2761</option>
 				</select>
-				<div><input class="btn btn-block btn-lg btn-primary" style="width:220px;" type="submit" value="Ду зе мэджик"></div>
+				<div><input class="btn btn-block btn-lg btn-primary" style="width:220px;" type="submit" value="Сделать магию"></div>
 			</form>
 		</div>
+        <div class="container" style="margin-top: 20px"><p>ВАЖНО: На данный момент сервис находится в стадии очень ранней альфа-версии. Основной функционал (собственно импорт расписания в Google Calendar) работает, и оттестирован для очень малого количества групп (сейчас - 3 группы).</p>
+            <p>Но поведение интерфейса - не идеально. В частности, <b>импорт расписания происходит только при показе страницы "Магия произошла"</b>. Чтобы добраться до этой страницы, в среднем потребуется 3 нажатия на кнопку "Сделать магию" (1. Разрешение на доступ к аккаунту; 2. Разрешение на доступ к календарю; 3. Непосредственно магия).</p>
+        </div>
   </div>
 	
 </body></html>
