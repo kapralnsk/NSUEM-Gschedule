@@ -4,6 +4,7 @@ __author__ = 'KAPRAL'
 import urllib2
 from bs4 import BeautifulSoup
 import datetime
+from settings import BASE_URL
 
 
 def changeWeek(week):
@@ -28,6 +29,11 @@ def setSemesterStart():
             startDate = startDate.replace(month=2, day=2)
     return startDate
 
+class Exercise(object):
+    def __init__(self):
+        self.week = 1
+        self.weekday = 0
+        self.time = self.type = self.name = self.room = None
 
 def getEventsList(group):
     """makes an events list
@@ -36,7 +42,7 @@ def getEventsList(group):
     """
     # fetching table
 
-    page = urllib2.urlopen("http://rasp.nsuem.ru/group/" + group)
+    page = urllib2.urlopen(BASE_URL + group)
     soup = BeautifulSoup(page)
 
     # limiting soup only to the table
@@ -44,24 +50,12 @@ def getEventsList(group):
     tableSoup = BeautifulSoup(unicode(table))
     currentRow = tableSoup.tbody.tr
 
-    # TODO remove if now useless
-    exercise = {
-    'week': 1,
-    'weekday': 0,
-    'time': '',
-    'type': '',
-    'name': '',
-    'room': ''
-    }
-
     eventsList = []
     week = 2
 
     # welcome to the PAIN
     while currentRow is not None:
-        try:
-            wut = currentRow.contents[0]  # TODO: i am ashamed of this
-        except IndexError:
+        if not currentRow.contents:
             currentRow = currentRow.find_next('tr')
         else:
             cell = currentRow.td
@@ -72,26 +66,26 @@ def getEventsList(group):
                 # processing empty cells (might be a func)
                 if cell.contents[0].encode('utf-8') == ' ':
                     if cell.next_sibling is not None:
-                        try:
-                            wut = cell.next_sibling['id']  # TODO: and this
-                        except KeyError:
+                        if not cell.next_sibling['id']:  # TODO: and this
                             week = changeWeek(week)  # TODO: and this
                     else:
                         week = changeWeek(week)
                     cell = cell.next_sibling
                     continue
 
+                exercise = Exercise()
+
                 try:
                     cellCSS_ID = cell['id'].encode('utf-8')
                 except KeyError:
                     week = changeWeek(week)
-                    exercise['week'] = week
+                    exercise.week = week
 
                     if cell.b is None:
-                        exercise['type'] = 'Л'
+                        exercise.type = 'Л'
                         cellData = getTD_Data(cell)
                     else:
-                        exercise['type'] = 'С'
+                        exercise.type = 'С'
                         cellData = getTD_Data(cell.b)
 
                     if cellData is None:
@@ -99,20 +93,18 @@ def getEventsList(group):
                         week = changeWeek(week)
                         break
 
-                    exercise['name'] = cellData['name']
-                    exercise['room'] = cellData['room']
+                    exercise.name = cellData['name']
+                    exercise.room = cellData['room']
                     eventsList.append(formCalEvent(exercise))
                 else:
                     if cellCSS_ID[0:3] == 'day':
-                        exercise['weekday'] = int(cellCSS_ID[4])
+                        exercise.weekday = int(cellCSS_ID[4])
                     elif cellCSS_ID[0:4] == 'time':
-                        exercise['time'] = cell.div.get_text().encode('utf-8')
+                        exercise.time = cell.div.get_text().encode('utf-8')
                 cell = cell.next_sibling
 
             # check if end of table is reached
-            try:
-                currentRow = currentRow.find_next('tr')
-            except AttributeError:
+            if not currentRow.find_next('tr'):
                 break
 
     return eventsList
@@ -154,8 +146,8 @@ def formCalEvent(exercise):
     exerciseEnd = exerciseStart + exerciseLength
 
     event = {
-    'summary': exercise['name'] + ' (' + exercise['type'] + ')'.encode('utf-8'),
-    'location': exercise['room'],
+    'summary': exercise.name + ' (' + exercise.type + ')'.encode('utf-8'),
+    'location': exercise.room,
     'start': {
     'dateTime': exerciseStart.strftime('%Y-%m-%d') + 'T' + exerciseStart.strftime('%H:%M') + ':00',
     'timeZone': 'Asia/Novosibirsk'
@@ -172,21 +164,21 @@ def formCalEvent(exercise):
 
 
 def setExerciseStartDateTime(exercise, semesterStart):
-    weekdaysDelta = datetime.timedelta(days=semesterStart.weekday() - exercise['weekday'])
+    weekdaysDelta = datetime.timedelta(days=semesterStart.weekday() - exercise.weekday)
     plus14DaysDelta = datetime.timedelta(days=14)
 
-    if semesterStart.weekday() > exercise['weekday']:
+    if semesterStart.weekday() > exercise.weekday:
         startDate = semesterStart - weekdaysDelta + plus14DaysDelta
-    elif semesterStart.weekday() == exercise['weekday']:
+    elif semesterStart.weekday() == exercise.weekday:
         startDate = semesterStart
-    elif semesterStart.weekday() < exercise['weekday']:
-        weekdaysDelta = datetime.timedelta(days=exercise['weekday'] - semesterStart.weekday())
+    elif semesterStart.weekday() < exercise.weekday:
+        weekdaysDelta = datetime.timedelta(days=exercise.weekday - semesterStart.weekday())
         startDate = semesterStart + weekdaysDelta
 
-    if exercise['week'] == 2:
+    if exercise.week == 2:
         startDate += datetime.timedelta(days=7)
 
-    startTime = datetime.datetime.strptime(exercise['time'], '%H:%M')
+    startTime = datetime.datetime.strptime(exercise.time, '%H:%M')
     startDate = startDate.replace(hour=startTime.hour, minute=startTime.minute)
 
     return startDate
