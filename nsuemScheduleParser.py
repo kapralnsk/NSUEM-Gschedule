@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-__author__ = 'KAPRAL'
 
+from __future__ import unicode_literals
 import urllib2
 from bs4 import BeautifulSoup
 import datetime
@@ -29,11 +29,13 @@ def setSemesterStart():
             startDate = startDate.replace(month=2, day=2)
     return startDate
 
+
 class Exercise(object):
     def __init__(self):
         self.week = 1
         self.weekday = 0
         self.time = self.type = self.name = self.room = None
+
 
 def getEventsList(group):
     """makes an events list
@@ -42,8 +44,8 @@ def getEventsList(group):
     """
     # fetching table
 
-    page = urllib2.urlopen(BASE_URL + group)
-    soup = BeautifulSoup(page)
+    page = urllib2.urlopen(BASE_URL + 'group/' + group)
+    soup = BeautifulSoup(page, 'html5lib')
 
     # limiting soup only to the table
     table = soup.find("table", {"class": "table table-hover table-bordered table-condensed"})
@@ -78,8 +80,7 @@ def getEventsList(group):
                 try:
                     cellCSS_ID = cell['id'].encode('utf-8')
                 except KeyError:
-                    week = changeWeek(week)
-                    exercise.week = week
+                    exercise.week = changeWeek(week)
 
                     if cell.b is None:
                         exercise.type = 'Л'
@@ -93,14 +94,16 @@ def getEventsList(group):
                         week = changeWeek(week)
                         break
 
-                    exercise.name = cellData['name']
+                    exercise.name = cellData['name'].decode('utf-8')
                     exercise.room = cellData['room']
+                    exercise.weekday = weekday
+                    exercise.time = time
                     eventsList.append(formCalEvent(exercise))
                 else:
                     if cellCSS_ID[0:3] == 'day':
-                        exercise.weekday = int(cellCSS_ID[4])
+                        weekday = int(cellCSS_ID[4])
                     elif cellCSS_ID[0:4] == 'time':
-                        exercise.time = cell.div.get_text().encode('utf-8')
+                        time = cell.div.get_text().encode('utf-8')
                 cell = cell.next_sibling
 
             # check if end of table is reached
@@ -146,7 +149,7 @@ def formCalEvent(exercise):
     exerciseEnd = exerciseStart + exerciseLength
 
     event = {
-    'summary': exercise.name + ' (' + exercise.type + ')'.encode('utf-8'),
+    'summary': '{} ({})'.format(exercise.name, exercise.type),
     'location': exercise.room,
     'start': {
     'dateTime': exerciseStart.strftime('%Y-%m-%d') + 'T' + exerciseStart.strftime('%H:%M') + ':00',
@@ -182,3 +185,5 @@ def setExerciseStartDateTime(exercise, semesterStart):
     startDate = startDate.replace(hour=startTime.hour, minute=startTime.minute)
 
     return startDate
+
+print len(getEventsList('2761'))
