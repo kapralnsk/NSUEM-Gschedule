@@ -1,3 +1,3 @@
 # NSUEM Gschedule
 
-This is a Python-based web app for NSUEM students (and maybe teachers). You specify your group name, and it parses your group schedule for a semester from [rasp.nsuem.ru](https://rasp.nsuem.ru) and pushes it to your Google Calendar as a new calendar.
+This is a Python-based web app for NSUEM students (later - teachers). It parses semester schdeul for given group from [rasp.nsuem.ru](https://rasp.nsuem.ru) and pushes it to your Google Calendar as a new calendar.
