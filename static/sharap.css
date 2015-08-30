@@ -1,0 +1,41 @@
+a {
+    color: #6F298C;
+}
+
+a:hover {
+    color: #9B59B6;
+}
+
+.btn-primary {
+    background-color: #6F298C;
+}
+
+.btn-primary:hover,
+.btn-primary.hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+  color: #fff;
+  background-color: #9B59B6;
+  border-color: #9B59B6;
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.open > .dropdown-toggle.btn-primary {
+    background: #9B59B6;
+    border-color: #9B59B6;
+}
+
+.checkbox input[type=checkbox].custom-checkbox:checked+.icons .icon-checked, .radio input[type=checkbox].custom-checkbox:checked+.icons .icon-checked, .checkbox input[type=radio].custom-radio:checked+.icons .icon-checked, .radio input[type=radio].custom-radio:checked+.icons .icon-checked{
+  color: #6F298C;
+}
+
+.explanation-toggle {
+  color: #6F298C;
+}
+
+.explanation-toggle:hover {
+    color: #9B59B6;
+}

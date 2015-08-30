@@ -1,0 +1,19 @@
+/*forcing checkbox to display inline with explanation-toggle*/
+.checkbox {
+    display: inline-block;
+}
+
+.explanation-toggle {
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+  color: #1abc9c;
+}
+
+.explanation-toggle:hover {
+    color: #48c9b0;
+}
+
+.popover-content {
+    font-size: 14px;
+}
