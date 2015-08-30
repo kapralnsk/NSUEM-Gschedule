@@ -9,5 +9,5 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
-BASE_URL = "http://rasp.nsuem.ru/"
+BASE_URL = "https://rasp.nsuem.ru/"
 
