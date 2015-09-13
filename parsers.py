@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import urllib2
 from bs4 import BeautifulSoup
 from settings import BASE_URL
-from exercise import Exercise
+from parser_results import Exercise
 
 
 class BaseParser(object):
