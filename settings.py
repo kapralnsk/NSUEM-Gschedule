@@ -11,3 +11,4 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 BASE_URL = "https://rasp.nsuem.ru/"
 
+DEFAULT_TIMEZONE = 'Asia/Novosibirsk'

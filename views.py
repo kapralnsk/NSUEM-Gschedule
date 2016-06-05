@@ -3,7 +3,6 @@ __author__ = 'alexandr'
 
 import os
 from oauth2client.appengine import OAuth2DecoratorFromClientSecrets
-from apiclient.discovery import build
 import nsuemScheduleParser
 import cgi
 from webapp2 import RequestHandler
@@ -14,7 +13,6 @@ decorator = OAuth2DecoratorFromClientSecrets(
   os.path.join(os.path.dirname(__file__), 'client_secrets.json'),
   'https://www.googleapis.com/auth/calendar')
 
-service = build('calendar', 'v3')
 
 
 class CustomRequestHandler(RequestHandler):
