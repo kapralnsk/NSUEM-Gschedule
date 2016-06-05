@@ -50,14 +50,6 @@ class ScheduleParser(BaseParser):
         return exercises
 
 
-class GroupsParser(BaseParser):
-    """
-    groups list parser
-    """
-    def parse(self):
-        pass
-
-
 class GroupScheduleParser(ScheduleParser):
     """
     parser for specific group schedule
@@ -70,4 +62,4 @@ class TeacherScheduleParser(ScheduleParser):
     """
     parser for specific teacher schedule
     """
-    pass
+    raise NotImplementedError
