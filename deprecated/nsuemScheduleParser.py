@@ -49,7 +49,7 @@ def getEventsList(group):
 
     # limiting soup only to the table
     table = soup.find("table", {"class": "table table-hover table-bordered table-condensed"})
-    tableSoup = BeautifulSoup(unicode(table))
+    tableSoup = BeautifulSoup(unicode(table), 'html5lib')
     currentRow = tableSoup.tbody.tr
 
     eventsList = []
@@ -66,7 +66,7 @@ def getEventsList(group):
             while cell is not None:
 
                 # processing empty cells (might be a func)
-                if cell.contents[0].encode('utf-8') == ' ':
+                if cell.contents[0] == u' ':
                     if cell.next_sibling is not None:
                         if not cell.next_sibling['id']:  # TODO: and this
                             week = changeWeek(week)  # TODO: and this
@@ -94,7 +94,7 @@ def getEventsList(group):
                         week = changeWeek(week)
                         break
 
-                    exercise.name = cellData['name'].decode('utf-8')
+                    exercise.name = cellData['name']
                     exercise.room = cellData['room']
                     exercise.weekday = weekday
                     exercise.time = time
@@ -103,26 +103,25 @@ def getEventsList(group):
                     if cellCSS_ID[0:3] == 'day':
                         weekday = int(cellCSS_ID[4])
                     elif cellCSS_ID[0:4] == 'time':
-                        time = cell.div.get_text().encode('utf-8')
+                        time = cell.div.get_text()
                 cell = cell.next_sibling
 
             # check if end of table is reached
-            if not currentRow.find_next('tr'):
-                break
+            currentRow = currentRow.find_next('tr')
+
 
     return eventsList
 
 
 def getTD_Data(scope):
-    data = scope.div
-
-    if data is None:
+    if scope.div is None:
         return None
 
     TD_Data = {}
-    name = data.get_text().encode('utf-8')
-    TD_Data['name'] = name[0:len(name) - 8]
-    TD_Data['room'] = data.a.get_text().encode('utf-8')
+
+    data = scope.div.get_text().split(',')
+    TD_Data['name'] = data[0]
+    TD_Data['room'] = data[1][:6]
     return TD_Data
 
 
@@ -185,5 +184,3 @@ def setExerciseStartDateTime(exercise, semesterStart):
     startDate = startDate.replace(hour=startTime.hour, minute=startTime.minute)
 
     return startDate
-
-print len(getEventsList('2761'))
